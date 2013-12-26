@@ -4,7 +4,7 @@ module.exports = function(grunt){
 
 	require('load-grunt-tasks')(grunt);
 
-	var onlyMocks = '<%= yeoman.app %>/scripts/**/*.mock.js';
+	var onlyMocks = '<%= yeoman.app %>/scripts/**/*.mock.js',
 		onlySources = ['<%= yeoman.app %>/scripts/**/*.js',
 					   '!' + onlyMocks,
 					   '!<%= yeoman.app %>/scripts/**/*.test.js'];
