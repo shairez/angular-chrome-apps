@@ -11,7 +11,7 @@ angular.module("chromeApps")
 					var deferred = $q.defer();
 
 					reader.onerror = function(event){
-						console.log("error", event.target.error);
+						console.debug("read error", event.target.error);
 						deferred.reject(event.target.error);
 					}
 					reader.onload = function(event){

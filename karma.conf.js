@@ -26,7 +26,7 @@ module.exports = function(config) {
 	preprocessors: {
 		'**/src/scripts/**/!(*.test|*.mock).js': 'coverage'
 	},
-	reporters: ['coverage'],
+	reporters: ['progress','coverage'],
 
     coverageReporter: {
 	  type : 'text'

@@ -86,7 +86,7 @@ angular.module("chromeApps")
 					var deferred = $q.defer();
 
 					reader.onerror = function(event){
-						console.log("error", event.target.error);
+						console.debug("read error", event.target.error);
 						deferred.reject(event.target.error);
 					}
 					reader.onload = function(event){
@@ -139,9 +139,11 @@ angular.module("chromeApps")
 					mimeType;
 
 				writer.onerror = function(event){
+					console.debug("write error", event.target.error);
 					deferred.reject(event.target.error);
 				}
-				writer.onwriteend = function(event){
+				writer.onwrite = function(event){
+					console.debug("@writingContent event", event);
 					deferred.resolve(event.target);
 				}
 
@@ -158,9 +160,10 @@ angular.module("chromeApps")
 				deleteFileContent: function(){
 					var deferred = $q.defer();
 					writer.onerror = function(event){
+						console.debug("truncate error", event.target.error);
 						deferred.reject(event.target.error);
 					}
-					writer.onwriteend = function(event){
+					writer.onwrite = function(event){
 						deferred.resolve(event.target);
 					}
 					writer.truncate(0);
@@ -169,8 +172,10 @@ angular.module("chromeApps")
 
 				writing: function(content, writeType, overwrite){
 					if (overwrite && this.getLength() > 0){
-						return this.deleteFileContent(function(){
+						return this.deleteFileContent().then(function success(){
 							return writingContent(content, writeType);
+						}, function error(error){
+							console.debug("@writing Truncate Error", TruncateError);
 						})
 					}
 					return writingContent(content, writeType);
@@ -181,6 +186,28 @@ angular.module("chromeApps")
 			}
 		}
 	}]);
+angular.module("mocks.chromeApps.services.adapters.html5.html5Mocks", [])
+	.factory("mocks.html5.fileWriter", function ($q) {
+
+		var mock = jasmine.createSpyObj("html5.fileWriter",
+			["write", "truncate"]);
+
+		return mock;
+	})
+
+	.factory("mocks.html5.directoryEntry", function ($q) {
+
+		var mock = {getDirectory: function(){}}
+
+		return mock;
+	})
+
+	.factory("mocks.html5.fileSystem", ["mocks.html5.directoryEntry", "$q",
+		function (directoryEntry, $q) {
+
+			var mock = {root: directoryEntry}
+			return mock;
+	}])
 angular.module("chromeApps")
 	.factory("chromeApps.services.facades.syncFileSystem",
 			 ["chromeApps.services.adapters.chrome.syncFileSystemAdapter",
@@ -197,7 +224,9 @@ angular.module("chromeApps")
 		}
 
 		function writingFileTextByEntry(fileEntryWrapper, text){
-			fileEntryWrapper.creatingWriter().then(function (writerWrapper){
+			return fileEntryWrapper.creatingWriter().then(function (writerWrapper){
+				console.log("============");
+				console.log("@writingFileTextByEntry got writerWrapper", writerWrapper);
 				text = text || "";
 				return writerWrapper.writing(text, ioTypes.TEXT, true);
 			})

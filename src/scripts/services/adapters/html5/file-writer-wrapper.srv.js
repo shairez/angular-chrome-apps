@@ -13,9 +13,11 @@ angular.module("chromeApps")
 					mimeType;
 
 				writer.onerror = function(event){
+					console.debug("write error", event.target.error);
 					deferred.reject(event.target.error);
 				}
-				writer.onwriteend = function(event){
+				writer.onwrite = function(event){
+					console.debug("@writingContent event", event);
 					deferred.resolve(event.target);
 				}
 
@@ -32,9 +34,10 @@ angular.module("chromeApps")
 				deleteFileContent: function(){
 					var deferred = $q.defer();
 					writer.onerror = function(event){
+						console.debug("truncate error", event.target.error);
 						deferred.reject(event.target.error);
 					}
-					writer.onwriteend = function(event){
+					writer.onwrite = function(event){
 						deferred.resolve(event.target);
 					}
 					writer.truncate(0);
@@ -43,8 +46,10 @@ angular.module("chromeApps")
 
 				writing: function(content, writeType, overwrite){
 					if (overwrite && this.getLength() > 0){
-						return this.deleteFileContent(function(){
+						return this.deleteFileContent().then(function success(){
 							return writingContent(content, writeType);
+						}, function error(error){
+							console.debug("@writing Truncate Error", TruncateError);
 						})
 					}
 					return writingContent(content, writeType);

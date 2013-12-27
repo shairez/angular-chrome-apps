@@ -14,7 +14,9 @@ angular.module("chromeApps")
 		}
 
 		function writingFileTextByEntry(fileEntryWrapper, text){
-			fileEntryWrapper.creatingWriter().then(function (writerWrapper){
+			return fileEntryWrapper.creatingWriter().then(function (writerWrapper){
+				console.log("============");
+				console.log("@writingFileTextByEntry got writerWrapper", writerWrapper);
 				text = text || "";
 				return writerWrapper.writing(text, ioTypes.TEXT, true);
 			})
