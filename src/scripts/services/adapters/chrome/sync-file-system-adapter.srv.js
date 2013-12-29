@@ -1,7 +1,7 @@
 angular.module("chromeApps")
 	.factory("chromeApps.services.adapters.chrome.syncFileSystemAdapter",
 		["$q", "chromeApps.services.adapters.html5.fileSystemWrapper",
-		 "chromeApps.services.adapters.chrome.chromeAppsApi",
+		 "chromeApps.services.native.chrome.chromeAppsApi",
 		 function ($q, fileSystemWrapper,
 		           chrome) {
 			var sfs = chrome.syncFileSystem;

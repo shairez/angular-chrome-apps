@@ -10,13 +10,20 @@ angular.module("chromeApps")
 					var deferred = $q.defer();
 					fileEntry.createWriter(function(writer){
 						deferred.resolve( fileWriterWrapper(writer) );
-					})
+					},
+						function(error){
+							deferred.reject(error);
+						}
+					)
 					return deferred.promise;
 				},
 				gettingFile: function(){
 					var deferred = $q.defer();
 					fileEntry.file(function(file){
 						deferred.resolve(file);
+					},
+					function(error){
+						deferred.reject(error);
 					})
 					return deferred.promise;
 				}

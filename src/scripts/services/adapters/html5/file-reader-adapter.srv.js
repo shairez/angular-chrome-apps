@@ -21,6 +21,11 @@ angular.module("chromeApps")
 						case ioTypes.TEXT:
 							reader.readAsText(file);
 						break;
+						default:
+							deferred.reject("readType is not defined");
+						break;
+
+
 					}
 					return deferred.promise;
 				}

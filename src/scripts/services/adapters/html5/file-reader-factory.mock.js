@@ -3,7 +3,7 @@ angular.module("mocks.chromeApps.services.adapters.html5.fileReaderFactory", [])
 
 		var factorySpy = jasmine.createSpy("chromeApps.services.html5.fileReaderFactory");
 
-		var fileReaderMock = jamsine.createSpyObj("fileReader",
+		var fileReaderMock = jasmine.createSpyObj("fileReader",
 												   ["abort",
 												    "readAsText"])
 		factorySpy.andReturn(fileReaderMock);

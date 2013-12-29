@@ -7,7 +7,7 @@ describe("fileWriterWrapper", function(){
 		ioTypes;
 
 	beforeEach(module("chromeApps"));
-	beforeEach(module("mocks.chromeApps.services.adapters.html5.html5Mocks"));
+	beforeEach(module("mocks.chromeApps.services.native.html5.html5Mocks"));
 
 	beforeEach(inject(["chromeApps.services.adapters.html5.fileWriterWrapper",
 					   "mocks.html5.fileWriter", "$rootScope",
@@ -33,7 +33,7 @@ describe("fileWriterWrapper", function(){
 					function error(error){
 						errorResult = error;
 					});
-			$rootScope.$digest();
+			$rootScope.$apply();
 		});
 
 		Then(function(){

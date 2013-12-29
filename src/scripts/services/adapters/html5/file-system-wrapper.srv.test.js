@@ -6,7 +6,7 @@ describe("fileSystemWrapper", function(){
 		directoryEntryWrapperMock;
 
 	beforeEach(module("chromeApps"));
-	beforeEach(module("mocks.chromeApps.services.adapters.html5.html5Mocks"));
+	beforeEach(module("mocks.chromeApps.services.native.html5.html5Mocks"));
 	beforeEach(module("mocks.chromeApps.services.adapters.html5.directoryEntryWrapper"));
 
 	beforeEach(inject(["chromeApps.services.adapters.html5.fileSystemWrapper",

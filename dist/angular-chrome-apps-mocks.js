@@ -1,25 +1,3 @@
-angular.module("mocks.chromeApps.services.adapters.chrome.chromeAppsApi", [])
-	.factory("chromeApps.services.adapters.chrome.chromeAppsApi", function ($q) {
-
-		var responses = {
-			syncFileSystem: {
-				requestFileSystem: "fileSystem"
-			}
-		}
-
-		var mock = {
-			responses: responses,
-
-			syncFileSystem: {
-				requestFileSystem: function(callback){
-					callback (responses.syncFileSystem.requestFileSystem);
-				}
-			}
-		}
-
-
-		return mock;
-	});
 angular.module("mocks.chromeApps.services.adapters.chrome.syncFileSystemAdapter", [])
 	.factory("chromeApps.services.adapters.chrome.syncFileSystemAdapter", function ($q) {
 
@@ -46,23 +24,48 @@ angular.module("mocks.chromeApps.services.adapters.html5.directoryEntryWrapper",
 		directoryEntryAdapterMock.gettingFileEntry.andReturn(directoryEntryAdapterMock.$deferred.gettingFileEntry.promise);
 		return wrapperSpy;
 	});
+angular.module("mocks.chromeApps.services.adapters.html5.fileEntryWrapper", ["mocks.chromeApps.services.native.html5.html5Mocks", "mocks.chromeApps.services.adapters.html5.directoryEntryWrapper"])
+	.factory("chromeApps.services.adapters.html5.fileEntryWrapper",
+			 ["$q", function ($q) {
+
+		var spy = jasmine.createSpy("chromeApps.services.adapters.html5.fileEntryWrapper");
+		var fileWriterAdapterMock = jasmine.createSpyObj("chromeApps.services.adapters.html5.fileEntryAdapter",
+									["creatingWriter",
+									 "gettingFile"])
+		fileWriterAdapterMock.$deferred = {
+			creatingWriter: $q.defer(),
+			gettingFile: $q.defer()
+		}
+		 fileWriterAdapterMock.creatingWriter.andReturn(fileWriterAdapterMock.$deferred.creatingWriter.promise);
+		 fileWriterAdapterMock.gettingFile.andReturn(fileWriterAdapterMock.$deferred.gettingFile.promise);
+
+		spy.andReturn(fileWriterAdapterMock);
+		return spy;
+	}]);
 angular.module("mocks.chromeApps.services.adapters.html5.fileReaderFactory", [])
 	.factory("chromeApps.services.adapters.html5.fileReaderFactory", function ($q) {
 
 		var factorySpy = jasmine.createSpy("chromeApps.services.html5.fileReaderFactory");
 
-		var fileReaderMock = jamsine.createSpyObj("fileReader",
+		var fileReaderMock = jasmine.createSpyObj("fileReader",
 												   ["abort",
 												    "readAsText"])
 		factorySpy.andReturn(fileReaderMock);
 		return factorySpy;
 	});
-angular.module("mocks.chromeApps.services.adapters.html5.fileSystemWrapper", [])
-	.factory("chromeApps.services.adapters.html5.fileSystemWrapper", function ($q) {
+angular.module("mocks.chromeApps.services.adapters.html5.fileSystemWrapper", ["mocks.chromeApps.services.native.html5.html5Mocks", "mocks.chromeApps.services.adapters.html5.directoryEntryWrapper"])
+	.factory("chromeApps.services.adapters.html5.fileSystemWrapper",
+			 ["mocks.html5.fileSystem", "$q", "chromeApps.services.adapters.html5.directoryEntryWrapper",
+				 function (fileSystem, $q, directoryEntryWrapper) {
 
 		var spy = jasmine.createSpy("chromeApps.services.adapters.html5.fileSystemWrapper");
+		var fileSystemAdapterMock = jasmine.createSpyObj("chromeApps.services.adapters.html5.fileSystemAdapter",
+									["getRoot"])
+		fileSystemAdapterMock.getRoot.andReturn(directoryEntryWrapper);
+
+		spy.andReturn(fileSystemAdapterMock);
 		return spy;
-	});
+	}]);
 angular.module("mocks.chromeApps.services.facades.syncFileSystem", [])
 	.factory("chromeApps.services.facades.syncFileSystem", function ($q) {
 
@@ -76,3 +79,38 @@ angular.module("mocks.chromeApps.services.facades.syncFileSystem", [])
 		mock.gettingTextFromFile.andReturn(mock.$deferred.gettingTextFromFile.promise);
 		return mock;
 	});
+angular.module("mocks.chromeApps.services.native.chrome.chromeAppsApi", ["mocks.chromeApps.services.adapters.html5.fileSystemWrapper"])
+	.factory("chromeApps.services.native.chrome.chromeAppsApi",
+	["chromeApps.services.adapters.html5.fileSystemWrapper", "$q",
+		function (fileSystemWrapper, $q) {
+
+		var mock = {
+			syncFileSystem: {
+				requestFileSystem: jasmine.createSpy("syncFileSystem.requestFileSystem")
+					.andCallFake(function(callback){
+					callback (fileSystemWrapper);
+				})
+			},
+			setConflictResolutionPolicy: function(){
+
+			},
+			getConflictResolutionPolicy: function(){
+
+			},
+			getUsageAndQuota: function(){
+
+			},
+			getFileStatus: function(){
+
+			},
+			getFileStatuses: function(){
+
+			},
+			getServiceStatus: function(){
+
+			}
+
+		}
+
+		return mock;
+	}]);

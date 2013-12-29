@@ -6,13 +6,16 @@ describe("syncFileSystemAdapter", function(){
 	    chromeAppsApiMock;
 
     beforeEach(module("chromeApps"));
+	beforeEach(module("mocks.chromeApps.services.native.html5.html5Mocks"));
     beforeEach(module("mocks.chromeApps.services.adapters.html5.fileSystemWrapper"));
-    beforeEach(module("mocks.chromeApps.services.adapters.chrome.chromeAppsApi"));
+    beforeEach(module("mocks.chromeApps.services.native.chrome.chromeAppsApi"));
+
 
     beforeEach(inject(["$rootScope",
 	                   "chromeApps.services.adapters.chrome.syncFileSystemAdapter",
 	                   "chromeApps.services.adapters.html5.fileSystemWrapper",
-	                    "chromeApps.services.adapters.chrome.chromeAppsApi",
+	                    "chromeApps.services.native.chrome.chromeAppsApi",
+	                    "mocks.html5.fileSystem",
 	           function(_$rootScope,
 		                syncFileSystemAdapter,
 	                    fileSystemWrapper,
@@ -20,20 +23,14 @@ describe("syncFileSystemAdapter", function(){
 					$rootScope = _$rootScope;
 					service = syncFileSystemAdapter;
 		            fileSystemWrapperSpy = fileSystemWrapper;
-		           chromeAppsApiMock = chromeAppsApi
+		            chromeAppsApiMock = chromeAppsApi;
     }]));
 
     describe("it should wrap the chrome filesystem object", function(){
-	    var fileSystem,
-		    wrappedFileSystem,
+	    var fileSystemAdapterMock,
 	        promiseResult;
 
-        Given(function(){
-	        fileSystem = "testFileSystem";
-	        wrappedFileSystem = "wrappedFileSystem";
-	        chromeAppsApiMock.responses.syncFileSystem.requestFileSystem = fileSystem;
-	        fileSystemWrapperSpy.andReturn(wrappedFileSystem);
-        });
+        Given(function(){ fileSystemAdapterMock = fileSystemWrapperSpy(); });
         When(function(){
 	        service.requestingFileSystem().then(function(result){
 		        promiseResult = result;
@@ -41,8 +38,8 @@ describe("syncFileSystemAdapter", function(){
 	        $rootScope.$apply();
         });
         Then(function(){
-	        expect(fileSystemWrapperSpy).toHaveBeenCalledWith(fileSystem);
-	        expect(promiseResult).toBe(wrappedFileSystem);
+	        expect(chromeAppsApiMock.syncFileSystem.requestFileSystem).toHaveBeenCalled();
+	        expect(promiseResult).toBe(fileSystemAdapterMock);
         });
 
     });
