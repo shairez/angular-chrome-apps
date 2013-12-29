@@ -24,22 +24,22 @@ angular.module("mocks.chromeApps.services.adapters.html5.directoryEntryWrapper",
 		directoryEntryAdapterMock.gettingFileEntry.andReturn(directoryEntryAdapterMock.$deferred.gettingFileEntry.promise);
 		return wrapperSpy;
 	});
-angular.module("mocks.chromeApps.services.adapters.html5.fileEntryWrapper", ["mocks.chromeApps.services.native.html5.html5Mocks", "mocks.chromeApps.services.adapters.html5.directoryEntryWrapper"])
+angular.module("mocks.chromeApps.services.adapters.html5.fileEntryWrapper", [])
 	.factory("chromeApps.services.adapters.html5.fileEntryWrapper",
 			 ["$q", function ($q) {
 
 		var spy = jasmine.createSpy("chromeApps.services.adapters.html5.fileEntryWrapper");
-		var fileWriterAdapterMock = jasmine.createSpyObj("chromeApps.services.adapters.html5.fileEntryAdapter",
+		var fileEntryAdapterMock = jasmine.createSpyObj("chromeApps.services.adapters.html5.fileEntryAdapter",
 									["creatingWriter",
 									 "gettingFile"])
-		fileWriterAdapterMock.$deferred = {
+		fileEntryAdapterMock.$deferred = {
 			creatingWriter: $q.defer(),
 			gettingFile: $q.defer()
 		}
-		 fileWriterAdapterMock.creatingWriter.andReturn(fileWriterAdapterMock.$deferred.creatingWriter.promise);
-		 fileWriterAdapterMock.gettingFile.andReturn(fileWriterAdapterMock.$deferred.gettingFile.promise);
+		 fileEntryAdapterMock.creatingWriter.andReturn(fileEntryAdapterMock.$deferred.creatingWriter.promise);
+		 fileEntryAdapterMock.gettingFile.andReturn(fileEntryAdapterMock.$deferred.gettingFile.promise);
 
-		spy.andReturn(fileWriterAdapterMock);
+		spy.andReturn(fileEntryAdapterMock);
 		return spy;
 	}]);
 angular.module("mocks.chromeApps.services.adapters.html5.fileReaderFactory", [])
@@ -64,6 +64,24 @@ angular.module("mocks.chromeApps.services.adapters.html5.fileSystemWrapper", ["m
 		fileSystemAdapterMock.getRoot.andReturn(directoryEntryWrapper);
 
 		spy.andReturn(fileSystemAdapterMock);
+		return spy;
+	}]);
+angular.module("mocks.chromeApps.services.adapters.html5.fileWriterWrapper", [])
+	.factory("chromeApps.services.adapters.html5.fileWriterWrapper",
+			 ["$q", function ($q) {
+
+		var spy = jasmine.createSpy("chromeApps.services.adapters.html5.fileWriterWrapper");
+		var fileWriterAdapterMock = jasmine.createSpyObj("chromeApps.services.adapters.html5.fileWriterAdapter",
+									["deleteFileContent",
+									 "writing"])
+		fileWriterAdapterMock.$deferred = {
+			deleteFileContent: $q.defer(),
+			writing: $q.defer()
+		}
+		 fileWriterAdapterMock.deleteFileContent.andReturn(fileWriterAdapterMock.$deferred.deleteFileContent.promise);
+		 fileWriterAdapterMock.writing.andReturn(fileWriterAdapterMock.$deferred.writing.promise);
+
+		spy.andReturn(fileWriterAdapterMock);
 		return spy;
 	}]);
 angular.module("mocks.chromeApps.services.facades.syncFileSystem", [])
@@ -114,3 +132,45 @@ angular.module("mocks.chromeApps.services.native.chrome.chromeAppsApi", ["mocks.
 
 		return mock;
 	}]);
+angular.module("mocks.chromeApps.services.native.html5.html5Mocks", [])
+	.factory("mocks.html5.fileWriter", function ($q) {
+
+		var mock = jasmine.createSpyObj("html5.fileWriter",
+			["write", "truncate"]);
+
+		return mock;
+	})
+
+	.factory("mocks.html5.directoryEntry", function ($q) {
+
+		var mock = {
+			getDirectory: function(){},
+			getFile: jasmine.createSpy("mocks.html5.directoryEntry.getFile")
+		}
+
+		return mock;
+	})
+
+	.factory("mocks.html5.fileSystem", ["mocks.html5.directoryEntry", "$q",
+		function (directoryEntry, $q) {
+
+			var mock = {root: directoryEntry}
+			return mock;
+	}])
+
+	.factory("mocks.html5.fileEntry", ["$q",
+		function ($q) {
+
+			var mock = jasmine.createSpyObj("mocks.html5.fileEntry",
+						["createWriter", "file"])
+			return mock;
+		}])
+
+	.factory("mocks.html5.file", [
+		function () {
+
+			var mock = {};
+			mock.name = "fileName";
+			mock.lastModified = "lastModified";
+			return mock;
+		}])
