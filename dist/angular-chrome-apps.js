@@ -3,22 +3,38 @@ angular.module("chromeApps")
 	.constant("chromeApps.constants.ioTypes", {
 		TEXT: "text"
 	});
-angular.module("chromeApps").directive("caSpeak", [function () {
+angular.module("chromeApps").directive("caSpeak",
+	["chromeApps.services.adapters.chrome.textToSpeechAdapter",
+		function (textToSpeechAdapter) {
 
 	return {
 		link: function (scope, element, attrs) {
 			element.on("click", function(){
 				scope.$apply(function(){
-					chrome.tts.speak(attrs.caSpeak);
+					textToSpeechAdapter.speak(attrs.caSpeak);
 				})
 			})
 
 		}
 	}
 }])
-
-
-
+angular.module("chromeApps")
+	.factory("chromeApps.services.adapters.chrome.fileSystemAdapter",
+		["$q", "chromeApps.services.adapters.html5.fileEntryWrapper",
+		 "chromeApps.services.native.chrome.chromeAppsApi",
+		 function ($q, fileEntryWrapper,
+		           chrome) {
+			var fs = chrome.fileSystem;
+			return {
+				choosingEntry: function(options){
+					var deferred = $q.defer();
+					fs.chooseEntry(options, function(fileEntry){
+						deferred.resolve(fileEntryWrapper(fileEntry));
+					})
+					return deferred.promise;
+				}
+			};
+	}]);
 angular.module("chromeApps")
 	.factory("chromeApps.services.adapters.chrome.syncFileSystemAdapter",
 		["$q", "chromeApps.services.adapters.html5.fileSystemWrapper",
@@ -33,6 +49,17 @@ angular.module("chromeApps")
 						deferred.resolve(fileSystemWrapper(fileSystem));
 					})
 					return deferred.promise;
+				}
+			};
+	}]);
+angular.module("chromeApps")
+	.factory("chromeApps.services.adapters.chrome.textToSpeechAdapter",
+		["chromeApps.services.native.chrome.chromeAppsApi",
+		 function (chrome) {
+			var tts = chrome.tts;
+			return {
+				speak: function(text){
+					tts.speak(text);
 				}
 			};
 	}]);
@@ -211,7 +238,40 @@ angular.module("chromeApps")
 		}
 	}]);
 angular.module("chromeApps")
-	.factory("chromeApps.services.facades.syncFileSystem",
+	.factory("chromeApps.services.facades.fileSystemFacade",
+			 ["chromeApps.services.adapters.chrome.fileSystemAdapter",
+			  "chromeApps.services.adapters.html5.fileReaderAdapter",
+			  "chromeApps.constants.ioTypes",
+			  function (fileSystemAdapter,
+			            fileReaderAdapter,
+	                    ioTypes) {
+
+		function writingFileTextByEntry(fileEntryWrapper, text){
+			return fileEntryWrapper.creatingWriter().then(function (writerWrapper){
+				text = text || "";
+				return writerWrapper.writing(text, ioTypes.TEXT, true);
+			})
+		}
+
+		return {
+			loadingTextFile: function(){
+			    return fileSystemAdapter.choosingEntry({type:"openFile"})
+				    .then(function success(fileEntryWrapper){
+				    return fileEntryWrapper.gettingFile().then(function success(file){
+					    return fileReaderAdapter.gettingFileContent(file, ioTypes.TEXT);
+				    })
+			    })
+			}
+//			savingTextToFile: function(filename, text){
+//				return gettingFileEntryByName(filename).then(function(fileEntryWrapper){
+//					return writingFileTextByEntry(fileEntryWrapper, text);
+//				})
+//			}
+		};
+
+}]);
+angular.module("chromeApps")
+	.factory("chromeApps.services.facades.syncFileSystemFacade",
 			 ["chromeApps.services.adapters.chrome.syncFileSystemAdapter",
 			  "chromeApps.services.adapters.html5.fileReaderAdapter",
 			  "chromeApps.constants.ioTypes",
@@ -227,8 +287,6 @@ angular.module("chromeApps")
 
 		function writingFileTextByEntry(fileEntryWrapper, text){
 			return fileEntryWrapper.creatingWriter().then(function (writerWrapper){
-				console.log("============");
-				console.log("@writingFileTextByEntry got writerWrapper", writerWrapper);
 				text = text || "";
 				return writerWrapper.writing(text, ioTypes.TEXT, true);
 			})

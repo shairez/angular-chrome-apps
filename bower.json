@@ -18,12 +18,11 @@
 		"apps"
 	],
 	"license": "MIT",
-	"homepage": "shairez.com",
+	"homepage": "https://github.com/shairez/angular-chrome-apps",
 	"ignore": [
 		"**/.*",
 		"node_modules",
 		"bower_components",
-		"test",
-		"tests"
+		"coverage"
 	]
 }

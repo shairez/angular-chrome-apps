@@ -8,7 +8,7 @@ xdescribe("syncFileSystem", function () {
 	beforeEach(module("mocks.chromeApps.services.adapters.html5.fileReaderFactory"));
 	beforeEach(module("mocks.chromeApps.services.adapters.chrome.syncFileSystemAdapter"));
 
-	beforeEach(inject(["chromeApps.services.facades.syncFileSystem",
+	beforeEach(inject(["chromeApps.services.facades.syncFileSystemFacade",
 					   "$rootScope", "fileReaderFactory",
 
 		function (syncFileSystem,

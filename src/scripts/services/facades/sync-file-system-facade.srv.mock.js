@@ -1,7 +1,7 @@
-angular.module("mocks.chromeApps.services.facades.syncFileSystem", [])
-	.factory("chromeApps.services.facades.syncFileSystem", function ($q) {
+angular.module("mocks.chromeApps.services.facades.syncFileSystemFacadeFacade", [])
+	.factory("chromeApps.services.facades.syncFileSystemFacadeFacade", function ($q) {
 
-		var mock = jasmine.createSpyObj("chromeApps.services.facades.syncFileSystem",
+		var mock = jasmine.createSpyObj("chromeApps.services.facades.syncFileSystemFacadeFacade",
 			["gettingTextFromFile",
 			 "savingTextToFile"]);
 

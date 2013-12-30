@@ -1,5 +1,5 @@
 angular.module("chromeApps")
-	.factory("chromeApps.services.facades.syncFileSystem",
+	.factory("chromeApps.services.facades.syncFileSystemFacade",
 			 ["chromeApps.services.adapters.chrome.syncFileSystemAdapter",
 			  "chromeApps.services.adapters.html5.fileReaderAdapter",
 			  "chromeApps.constants.ioTypes",
@@ -15,8 +15,6 @@ angular.module("chromeApps")
 
 		function writingFileTextByEntry(fileEntryWrapper, text){
 			return fileEntryWrapper.creatingWriter().then(function (writerWrapper){
-				console.log("============");
-				console.log("@writingFileTextByEntry got writerWrapper", writerWrapper);
 				text = text || "";
 				return writerWrapper.writing(text, ioTypes.TEXT, true);
 			})
